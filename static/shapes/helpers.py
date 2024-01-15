@@ -4,7 +4,7 @@ import signal
 from contextlib import contextmanager
 from time import time
 from typing import IO, Generator, List, Optional, Tuple, Union
-
+import threading
 from pyroutelib3 import distHaversine
 
 from ..const import DIR_SHAPE_CACHE, SHAPE_CACHE_TTL
@@ -16,16 +16,16 @@ _Pt = Tuple[float, float]
 
 
 @contextmanager
-def time_limit(sec) -> Generator[None, None, None]:
-    "Time limter based on https://gist.github.com/Rabbit52/7449101"
-    def handler(x, y):
+def time_limit(sec):
+    def callback():
         raise TimeoutError
-    signal.signal(signal.SIGALRM, handler)
-    signal.alarm(sec)
+
+    timer = threading.Timer(sec, callback)
+    timer.start()
     try:
         yield
     finally:
-        signal.alarm(0)
+        timer.cancel()
 
 
 def total_length(x: List[_Pt]) -> float:
