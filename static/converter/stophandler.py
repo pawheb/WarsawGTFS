@@ -214,7 +214,7 @@ class StopHandler:
 
         # If this station has no external data - throw an error
         if not station:
-            raise ValueError(f"Missing railway station data for {group_id} ({group_name})")
+            return
 
         unmatched_stakes: set[str] = set(stake.id for stake in virtual_stops)
 
@@ -352,12 +352,7 @@ class StopHandler:
             return None
 
         elif valid_id not in self.data:
-            assert valid_id[1:3] in RAIL_STATION_ID_MIDDLES, \
-                "not loaded stakes should only happen for railway stations"
-
-            raise ValueError(f"Unmapped ZTM code {valid_id} at a railway station "
-                             f"({self.data[valid_id[:4]]['stop_name']})")
-
+            return None
         else:
             return valid_id
 
